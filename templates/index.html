@@ -3,77 +3,92 @@
 <head>
     <title>Funny Photo Booth</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap');
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif; /* Modern and clean */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background-color: #f4f4f4;
+            background-color: #d3d3d3; /* Bigger light grey background */
             margin: 0;
-            padding: 20px;
+            padding: 40px; /* Increased padding for bigger background feel */
             box-sizing: border-box;
         }
 
         #app-container {
             background-color: #fff;
             border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 30px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* More pronounced shadow */
+            padding: 50px; /* Increased padding */
             text-align: center;
         }
 
+        h1 {
+            color: #343a40; /* Dark grey heading */
+            margin-bottom: 30px;
+            font-weight: 600; /* Semi-bold */
+            font-size: 2.7rem; /* Slightly larger heading */
+        }
+
         #camera-container {
-            width: 150px; /* Smaller, more abstract */
-            height: 150px;
-            border: 2px solid #ccc;
+            width: 200px; /* Further increased camera container size */
+            height: 200px; /* Further increased camera container size */
+            border: 3px solid #adb5bd; /* Medium grey border */
             position: relative;
             overflow: hidden;
             border-radius: 50%;
-            margin-bottom: 20px;
+            margin-bottom: 35px;
+            display: flex; /* Center the video */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
             transition: border-color 0.3s ease-in-out;
         }
 
         #camera-container.active {
-            border-color: #007bff;
+            border-color: #00bfa5; /* Teal active color */
         }
 
         #camera-feed {
-            width: 100%;
-            height: 100%;
+            width: auto; /* Adjust width to maintain aspect ratio */
+            height: auto; /* Adjust height to maintain aspect ratio */
+            min-width: 100%; /* Ensure it covers the container */
+            min-height: 100%; /* Ensure it covers the container */
             object-fit: cover;
+            transform: scaleX(-1); /* Apply horizontal flip for mirror effect */
         }
 
         #capture-btn {
-            background-color: #007bff;
+            background-color: #00bfa5; /* Teal button */
             color: white;
             border: none;
-            border-radius: 50%; /* Circular button */
-            width: 80px; /* Larger button */
-            height: 80px;
-            font-size: 1.5rem;
+            border-radius: 50%;
+            width: 100px; /* Slightly larger button */
+            height: 100px; /* Slightly larger button */
+            font-size: 2rem; /* Slightly larger font */
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* More prominent shadow */
             transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
             outline: none;
         }
 
         #capture-btn:hover {
-            transform: scale(1.05);
-            background-color: #0056b3;
+            transform: scale(1.08);
+            background-color: #00897b; /* Darker teal on hover */
         }
 
         #capture-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
         }
 
         #comment-container {
-            margin-top: 30px;
-            padding: 20px;
-            border: 1px dashed #ccc;
-            border-radius: 10px;
-            background-color: #f9f9f9;
+            margin-top: 50px; /* Increased margin */
+            padding: 30px; /* Increased padding */
+            border: 2px dashed #ced4da; /* Light grey dashed border */
+            border-radius: 12px;
+            background-color: #f8f9fa; /* Very light grey background */
             text-align: center;
             opacity: 0;
             transform: translateY(20px);
@@ -85,10 +100,17 @@
             transform: translateY(0);
         }
 
+        #comment-container h2 {
+            color: #495057; /* Medium grey heading */
+            font-size: 2rem; /* Slightly larger font */
+            margin-bottom: 20px; /* Increased margin */
+            font-weight: 600;
+        }
+
         #comment {
             font-style: italic;
-            color: #555;
-            font-size: 1.1rem;
+            color: #6c757d; /* Slate grey comment text */
+            font-size: 1.3rem; /* Slightly larger font */
         }
 
         .hidden {
@@ -98,12 +120,12 @@
         /* Animation for camera container */
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.03); } /* Even less intense pulse for larger size */
             100% { transform: scale(1); }
         }
 
         #camera-container.pulsing {
-            animation: pulse 2s infinite alternate;
+            animation: pulse 1.5s infinite alternate; /* Faster pulse */
         }
     </style>
 </head>
@@ -111,10 +133,10 @@
     <div id="app-container">
         <h1>Say Cheese!</h1>
         <div id="camera-container" class="pulsing">
-            <video id="camera-feed" autoplay playsinline></video>
+            <video id="camera-feed" autoplay playsinline style="transform: scaleX(-1);"></video>
         </div>
         <button id="capture-btn">📸</button>
-        <canvas id="canvas" width="150" height="150" class="hidden"></canvas>
+        <canvas id="canvas" width="200" height="200" class="hidden"></canvas>
         <div id="comment-container" class="hidden">
             <h2>Gemini Says:</h2>
             <p id="comment"></p>
@@ -168,7 +190,11 @@
             context.beginPath();
             context.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI);
             context.clip();
+            // Importantly, we also need to flip the drawing context horizontally
+            context.translate(size, 0);
+            context.scale(-1, 1);
             context.drawImage(cameraFeed, offsetX, offsetY, size, size, 0, 0, size, size);
+            context.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
 
             const imageDataURL = canvas.toDataURL('image/jpeg');
             const base64Image = imageDataURL.split(',')[1];
