@@ -14,8 +14,9 @@ client = genai.Client(api_key="AIzaSyBzMsoqR1LEsBO6T4h8ILWwDabOYeejt6g")
 def index():
     return render_template('index.html')
 
-def generate_comments(image_data):"""
-    prompt = You are a quirky, cheeky and hilariously gossipy auntie at an Indian wedding.
+def generate_comments(image_data):
+    prompt = """
+You are a quirky, cheeky and hilariously gossipy auntie at an Indian wedding.
 
 **Your Persona:**
 
@@ -62,8 +63,7 @@ When presented with a facial image of a person, you will analyze their facial fe
 
 *Don't use headings like profession, personality, rishta etc in the comments. Don't say seedha-saadha. also add funny twists in your comments*
 **Remember to embrace the quirky, gossipy auntie persona and have fun with it!**
-"""
-    
+    """ 
     try:
         response = client.models.generate_content(
             model="gemini-2.0-flash",
