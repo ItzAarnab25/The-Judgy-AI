@@ -1,98 +1,129 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Funny Photo Booth</title>
+    <title>Party Photo Booth!</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@400;700&display=swap');
 
         body {
-            font-family: 'Poppins', sans-serif; /* Modern and clean */
+            font-family: 'Montserrat', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             min-height: 100vh;
-            background-color: #d3d3d3; /* Bigger light grey background */
+            background-color: #FF6B6B; /* Vibrant Red */
             margin: 0;
-            padding: 40px; /* Increased padding for bigger background feel */
+            padding: 30px;
             box-sizing: border-box;
+            background-image: radial-gradient(circle, rgba(255, 218, 185, 0.2) 20%, transparent 60%), /* Peach puff highlights */
+                              linear-gradient(45deg, rgba(255, 255, 0, 0.15) 15%, transparent 50%), /* Yellow streaks */
+                              linear-gradient(-45deg, rgba(0, 255, 255, 0.1) 25%, transparent 65%); /* Cyan hints */
+            color: #333; /* Dark gray for text */
         }
 
         #app-container {
-            background-color: #fff;
-            border-radius: 15px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* More pronounced shadow */
-            padding: 50px; /* Increased padding */
+            background-color: rgba(255, 255, 255, 0.85); /* Semi-transparent white */
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            padding: 50px;
             text-align: center;
+            width: 95%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 4px solid #FFA07A; /* Light Salmon border */
         }
 
         h1 {
-            color: #343a40; /* Dark grey heading */
-            margin-bottom: 30px;
-            font-weight: 600; /* Semi-bold */
-            font-size: 2.7rem; /* Slightly larger heading */
+            font-family: 'Bangers', cursive;
+            color: #FFD700; /* Bright Yellow */
+            margin-bottom: 40px;
+            font-size: 3rem;
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4);
+            letter-spacing: 1.5px;
         }
 
         #camera-container {
-            width: 200px; /* Further increased camera container size */
-            height: 200px; /* Further increased camera container size */
-            border: 3px solid #adb5bd; /* Medium grey border */
+            width: 180px;
+            height: 180px;
+            border: 5px solid #F08080; /* Light Coral border */
             position: relative;
             overflow: hidden;
             border-radius: 50%;
-            margin-bottom: 35px;
-            display: flex; /* Center the video */
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             transition: border-color 0.3s ease-in-out;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
         }
 
         #camera-container.active {
-            border-color: #00bfa5; /* Teal active color */
+            border-color: #00CED1; /* Turquoise when active */
         }
 
         #camera-feed {
-            width: auto; /* Adjust width to maintain aspect ratio */
-            height: auto; /* Adjust height to maintain aspect ratio */
-            min-width: 100%; /* Ensure it covers the container */
-            min-height: 100%; /* Ensure it covers the container */
+            width: auto;
+            height: auto;
+            min-width: 100%;
+            min-height: 100%;
             object-fit: cover;
-            transform: scaleX(-1); /* Apply horizontal flip for mirror effect */
+            transform: scaleX(-1);
+            filter: brightness(1.1) contrast(1.05); /* Enhance the feed */
         }
 
-        #capture-btn {
-            background-color: #00bfa5; /* Teal button */
+        #capture-flip-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        #capture-btn,
+        #flip-btn,
+        #share-btn {
+            background-color: #00CED1; /* Turquoise buttons */
             color: white;
             border: none;
             border-radius: 50%;
-            width: 100px; /* Slightly larger button */
-            height: 100px; /* Slightly larger button */
-            font-size: 2rem; /* Slightly larger font */
+            width: 80px;
+            height: 80px;
+            font-size: 1.8rem;
             cursor: pointer;
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2); /* More prominent shadow */
-            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             outline: none;
+            margin: 0 20px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         }
 
-        #capture-btn:hover {
-            transform: scale(1.08);
-            background-color: #00897b; /* Darker teal on hover */
+        #capture-btn:hover,
+        #flip-btn:hover,
+        #share-btn:hover {
+            transform: scale(1.1);
+            background-color: #40E0D0; /* Brighter Turquoise on hover */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.35);
         }
 
-        #capture-btn:active {
-            transform: scale(0.92);
+        #capture-btn:active,
+        #flip-btn:active,
+        #share-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 3px 7px rgba(0, 0, 0, 0.25);
         }
 
         #comment-container {
-            margin-top: 50px; /* Increased margin */
-            padding: 30px; /* Increased padding */
-            border: 2px dashed #ced4da; /* Light grey dashed border */
-            border-radius: 12px;
-            background-color: #f8f9fa; /* Very light grey background */
+            margin-top: 50px;
+            padding: 30px;
+            border: 3px dashed #FFD700; /* Bright Yellow dashed border */
+            border-radius: 15px;
+            background-color: rgba(255, 215, 0, 0.15); /* Light Yellow background */
             text-align: center;
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
         }
 
         #comment-container.show {
@@ -101,33 +132,45 @@
         }
 
         #comment-container h2 {
-            color: #495057; /* Medium grey heading */
-            font-size: 2rem; /* Slightly larger font */
-            margin-bottom: 20px; /* Increased margin */
-            font-weight: 600;
+            font-family: 'Bangers', cursive;
+            color: #FF6B6B; /* Vibrant Red for comment heading */
+            font-size: 2rem;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
         }
 
         #comment {
             font-style: italic;
-            color: #6c757d; /* Slate grey comment text */
-            font-size: 1.3rem; /* Slightly larger font */
+            color: #555; /* Darker gray for comment text */
+            font-size: 1.3rem;
+            line-height: 1.7;
         }
 
         .hidden {
             display: none;
         }
 
-        /* Animation for camera container */
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.03); } /* Even less intense pulse for larger size */
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.9;
+            }
         }
 
         #camera-container.pulsing {
-            animation: pulse 1.5s infinite alternate; /* Faster pulse */
+            animation: pulse 1.5s infinite alternate;
         }
     </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
     <div id="app-container">
@@ -135,10 +178,15 @@
         <div id="camera-container" class="pulsing">
             <video id="camera-feed" autoplay playsinline style="transform: scaleX(-1);"></video>
         </div>
-        <button id="capture-btn">📸</button>
-        <canvas id="canvas" width="200" height="200" class="hidden"></canvas>
+        <div id="capture-flip-container">
+            <button id="capture-btn">🎉</button>
+            <button id="flip-btn">🔄</button>
+            <button id="share-btn" class="hidden">📤</button>
+        </div>
+        <canvas id="canvas" width="160" height="160" class="hidden"></canvas>
+        <canvas id="share-canvas" class="hidden"></canvas>
         <div id="comment-container" class="hidden">
-            <h2>Gemini Says:</h2>
+            <h2>Get Ready to Laugh!</h2>
             <p id="comment"></p>
         </div>
     </div>
@@ -148,14 +196,20 @@
         const cameraContainer = document.getElementById('camera-container');
         const captureBtn = document.getElementById('capture-btn');
         const canvas = document.getElementById('canvas');
+        const shareCanvas = document.getElementById('share-canvas');
         const commentContainer = document.getElementById('comment-container');
         const commentDisplay = document.querySelector('#comment-container #comment');
+        const flipBtn = document.getElementById('flip-btn');
+        const shareBtn = document.getElementById('share-btn');
         let stream;
         let isPaused = false;
+        let facingMode = 'user';
+        let capturedImageDataURL;
+        let geminiComment;
 
         async function startCamera() {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode }, audio: false });
                 cameraFeed.srcObject = stream;
                 cameraContainer.classList.add('active');
                 cameraContainer.classList.remove('pulsing');
@@ -190,22 +244,26 @@
             context.beginPath();
             context.arc(size / 2, size / 2, size / 2, 0, 2 * Math.PI);
             context.clip();
-            // Importantly, we also need to flip the drawing context horizontally
-            context.translate(size, 0);
-            context.scale(-1, 1);
-            context.drawImage(cameraFeed, offsetX, offsetY, size, size, 0, 0, size, size);
-            context.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
 
-            const imageDataURL = canvas.toDataURL('image/jpeg');
-            const base64Image = imageDataURL.split(',')[1];
+            if (facingMode === 'user') {
+                context.translate(size, 0);
+                context.scale(-1, 1);
+            }
+
+            context.drawImage(cameraFeed, offsetX, offsetY, size, size, 0, 0, size, size);
+            context.setTransform(1, 0, 0, 1, 0, 0);
+
+            capturedImageDataURL = canvas.toDataURL('image/jpeg');
+            const base64Image = capturedImageDataURL.split(',')[1];
             console.log("Image captured and encoded (first 50 chars):", base64Image.substring(0, 50) + "...");
 
             commentContainer.classList.remove('show');
-            commentContainer.classList.add('hidden'); // Ensure it's hidden before the timeout
+            commentContainer.classList.add('hidden');
+            shareBtn.classList.add('hidden');
 
             setTimeout(() => {
                 sendImageForComment(base64Image);
-            }, 200); // Increased delay
+            }, 200);
         }
 
         async function sendImageForComment(base64Image) {
@@ -225,10 +283,12 @@
                     const data = await response.json();
                     console.log("Fetch Data:", data);
                     if (data && data.comment) {
-                        commentDisplay.textContent = data.comment;
-                        commentContainer.classList.remove('hidden'); // Make it visible
+                        geminiComment = data.comment;
+                        commentDisplay.textContent = geminiComment;
+                        commentContainer.classList.remove('hidden');
                         commentContainer.classList.add('show');
-                        console.log("Comment displayed:", data.comment);
+                        shareBtn.classList.remove('hidden'); // Show the share button here!
+                        console.log("Comment displayed:", geminiComment);
                     } else {
                         console.error("Error: Comment data is missing in the response.");
                         alert("Failed to get a funny comment.");
@@ -247,12 +307,55 @@
                     isPaused = false;
                     cameraContainer.classList.add('active');
                     console.log("Camera resumed.");
-                }, 750); // Slightly increased resume delay
+                }, 750);
             }
         }
 
+        async function toggleCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            facingMode = facingMode === 'user' ? 'environment' : 'user';
+            startCamera();
+        }
+
+        async function sharePhotoAndComment() {
+            if (navigator.share) {
+                try {
+                    const appContainer = document.getElementById('app-container');
+                    const canvas = await html2canvas(appContainer);
+                    const shareDataURL = canvas.toDataURL('image/jpeg');
+
+                    navigator.share({
+                        title: 'Funny Photo Booth!',
+                        files: [dataURLtoFile(shareDataURL, 'shared_photo.jpeg')],
+                    });
+
+                } catch (error) {
+                    console.error('Sharing failed:', error);
+                }
+            } else {
+                alert('Sharing is not supported on this browser.');
+            }
+        }
+
+        function dataURLtoFile(dataurl, filename) {
+            const arr = dataurl.split(',');
+            const mime = arr[0].match(/:(.*?);/)[1];
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new File([u8arr], filename, { type: mime });
+        }
+
         captureBtn.addEventListener('click', capturePhoto);
+        flipBtn.addEventListener('click', toggleCamera);
+        shareBtn.addEventListener('click', sharePhotoAndComment);
         startCamera();
     </script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </body>
 </html>
