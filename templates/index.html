@@ -373,6 +373,7 @@
         async function toggleCamera() {
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
+                stream = null; // Important: Set stream to null
             }
             facingMode = facingMode === 'user' ? 'environment' : 'user';
             startCamera();
