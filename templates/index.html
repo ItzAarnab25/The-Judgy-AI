@@ -20,6 +20,9 @@
                               linear-gradient(45deg, rgba(255, 255, 0, 0.15) 15%, transparent 50%), /* Yellow streaks */
                               linear-gradient(-45deg, rgba(0, 255, 255, 0.1) 25%, transparent 65%); /* Cyan hints */
             color: #333; /* Dark gray for text */
+            position: relative; /* To position the confetti canvas */
+            overflow-x: hidden;  /* Prevent horizontal scrollbar */
+            overflow-y: auto;    /* Enable vertical scrollbar */
         }
 
         #app-container {
@@ -29,55 +32,76 @@
             padding: 50px;
             text-align: center;
             width: 95%;
-            max-width: 500px;
+            max-width: 600px; /* Increased max-width for potentially larger screenshot */
             display: flex;
             flex-direction: column;
             align-items: center;
             border: 4px solid #FFA07A; /* Light Salmon border */
+            position: relative; /* For stacking context with confetti */
+            z-index: 1; /* Ensure it's above the confetti */
+            margin-bottom: 20px; /* Add margin to the bottom to prevent content overlap with fixed confetti */
         }
 
         h1 {
             font-family: 'Bangers', cursive;
             color: #FFD700; /* Bright Yellow */
-            margin-bottom: 40px;
+            margin-bottom: 20px; /* Reduced margin */
             font-size: 3rem;
             text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4);
             letter-spacing: 1.5px;
         }
 
         #camera-container {
-            width: 180px;
-            height: 180px;
+            width: 240px; /* Increased size */
+            height: 240px; /* Increased size */
             border: 5px solid #F08080; /* Light Coral border */
             position: relative;
             overflow: hidden;
             border-radius: 50%;
-            margin-bottom: 40px;
+            margin-bottom: 20px; /* Reduced margin */
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: border-color 0.3s ease-in-out;
+            transition: border-color 0.3s ease-in-out, border-width 0.3s ease-in-out; /* Added transition for border-width */
             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            cursor: pointer; /* Make it clickable */
+            border-width: 5px; /* Initial border width */
         }
 
         #camera-container.active {
             border-color: #00CED1; /* Turquoise when active */
         }
 
-        #camera-feed {
+        #camera-container.captured {
+            border-width: 10px; /* Increased border width when captured */
+            border-color: #FFA07A; /* Change border color when captured */
+        }
+
+        #camera-feed, #captured-image-display {
             width: auto;
             height: auto;
             min-width: 100%;
             min-height: 100%;
             object-fit: cover;
+        }
+
+        #camera-feed.no-mirror {
+            transform: scaleX(1);
+        }
+
+        #camera-feed {
             transform: scaleX(-1);
-            filter: brightness(1.1) contrast(1.05); /* Enhance the feed */
+            display: block; /* Initially show the feed */
+        }
+
+        #captured-image-display {
+            display: none; /* Initially hidden */
         }
 
         #capture-flip-container {
             display: flex;
             justify-content: center;
-            margin-bottom: 40px;
+            margin-bottom: 20px; /* Reduced margin */
         }
 
         #capture-btn,
@@ -94,7 +118,7 @@
             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
             transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             outline: none;
-            margin: 0 20px;
+            margin: 0 15px; /* Adjusted margin */
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
         }
 
@@ -114,8 +138,8 @@
         }
 
         #comment-container {
-            margin-top: 50px;
-            padding: 30px;
+            margin-top: 30px; /* Adjusted margin */
+            padding: 20px; /* Adjusted padding */
             border: 3px dashed #FFD700; /* Bright Yellow dashed border */
             border-radius: 15px;
             background-color: rgba(255, 215, 0, 0.15); /* Light Yellow background */
@@ -134,8 +158,8 @@
         #comment-container h2 {
             font-family: 'Bangers', cursive;
             color: #FF6B6B; /* Vibrant Red for comment heading */
-            font-size: 2rem;
-            margin-bottom: 25px;
+            font-size: 1.8rem; /* Adjusted font size */
+            margin-bottom: 15px; /* Adjusted margin */
             text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
             letter-spacing: 1px;
         }
@@ -143,8 +167,8 @@
         #comment {
             font-style: italic;
             color: #555; /* Darker gray for comment text */
-            font-size: 1.3rem;
-            line-height: 1.7;
+            font-size: 1.2rem; /* Adjusted font size */
+            line-height: 1.6; /* Adjusted line height */
         }
 
         .hidden {
@@ -169,30 +193,45 @@
         #camera-container.pulsing {
             animation: pulse 1.5s infinite alternate;
         }
+
+        /* Confetti styles */
+        canvas#confetti-canvas {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 10; /* Place it above the background but below app-container */
+            pointer-events: none;
+        }
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
+    <canvas id="confetti-canvas"></canvas>
     <div id="app-container">
         <h1>Say Cheese!</h1>
         <div id="camera-container" class="pulsing">
-            <video id="camera-feed" autoplay playsinline style="transform: scaleX(-1);"></video>
+            <video id="camera-feed" autoplay playsinline></video>
+            <img id="captured-image-display" style="display: none;">
         </div>
         <div id="capture-flip-container">
             <button id="capture-btn">🎉</button>
             <button id="flip-btn">🔄</button>
             <button id="share-btn" class="hidden">📤</button>
         </div>
-        <canvas id="canvas" width="160" height="160" class="hidden"></canvas>
-        <canvas id="share-canvas" class="hidden"></canvas>
+        <canvas id="canvas" width="240" height="240" class="hidden"></canvas> <canvas id="share-canvas" class="hidden"></canvas>
         <div id="comment-container" class="hidden">
             <h2>Get Ready to Laugh!</h2>
             <p id="comment"></p>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script>
         const cameraFeed = document.getElementById('camera-feed');
+        const capturedImageDisplay = document.getElementById('captured-image-display');
         const cameraContainer = document.getElementById('camera-container');
         const captureBtn = document.getElementById('capture-btn');
         const canvas = document.getElementById('canvas');
@@ -201,11 +240,14 @@
         const commentDisplay = document.querySelector('#comment-container #comment');
         const flipBtn = document.getElementById('flip-btn');
         const shareBtn = document.getElementById('share-btn');
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        const jsConfetti = new JSConfetti({ canvas: confettiCanvas });
         let stream;
         let isPaused = false;
         let facingMode = 'user';
         let capturedImageDataURL;
         let geminiComment;
+        let showingCapturedImage = false;
 
         async function startCamera() {
             try {
@@ -213,11 +255,26 @@
                 cameraFeed.srcObject = stream;
                 cameraContainer.classList.add('active');
                 cameraContainer.classList.remove('pulsing');
-                console.log("Camera started successfully.");
+                cameraContainer.classList.remove('captured'); // Remove captured class
+                capturedImageDisplay.style.display = 'none';
+                cameraFeed.style.display = 'block';
+                showingCapturedImage = false;
+                updateVideoMirror();
+                console.log("Camera started successfully with facing mode:", facingMode);
             } catch (err) {
                 console.error("Error accessing camera: ", err);
                 alert("Failed to access camera. Please check your browser permissions.");
                 cameraContainer.classList.remove('active');
+            }
+        }
+
+        function updateVideoMirror() {
+            if (facingMode === 'user') {
+                cameraFeed.classList.remove('no-mirror');
+                cameraFeed.style.transform = 'scaleX(-1)';
+            } else {
+                cameraFeed.classList.add('no-mirror');
+                cameraFeed.style.transform = 'scaleX(1)';
             }
         }
 
@@ -230,7 +287,8 @@
             cameraFeed.pause();
             isPaused = true;
             cameraContainer.classList.remove('active');
-            console.log("Video paused, preparing to capture.");
+            cameraContainer.classList.add('captured'); // Add captured class
+            console.log("Video paused, photo capturing.");
 
             const context = canvas.getContext('2d');
             const width = cameraFeed.videoWidth;
@@ -254,6 +312,11 @@
             context.setTransform(1, 0, 0, 1, 0, 0);
 
             capturedImageDataURL = canvas.toDataURL('image/jpeg');
+            capturedImageDisplay.src = capturedImageDataURL;
+            cameraFeed.style.display = 'none';
+            capturedImageDisplay.style.display = 'block';
+            showingCapturedImage = true;
+
             const base64Image = capturedImageDataURL.split(',')[1];
             console.log("Image captured and encoded (first 50 chars):", base64Image.substring(0, 50) + "...");
 
@@ -261,9 +324,12 @@
             commentContainer.classList.add('hidden');
             shareBtn.classList.add('hidden');
 
-            setTimeout(() => {
-                sendImageForComment(base64Image);
-            }, 200);
+            sendImageForComment(base64Image);
+
+            // Trigger confetti animation
+            jsConfetti.addConfetti({
+                emojis: ['🌈', '⚡️', '💥', '✨', '💫', '🌸'],
+            }).then(() => jsConfetti.addConfetti());
         }
 
         async function sendImageForComment(base64Image) {
@@ -301,13 +367,6 @@
             } catch (error) {
                 console.error("Error sending image:", error);
                 alert("Failed to send image to the server.");
-            } finally {
-                setTimeout(() => {
-                    cameraFeed.play();
-                    isPaused = false;
-                    cameraContainer.classList.add('active');
-                    console.log("Camera resumed.");
-                }, 750);
             }
         }
 
@@ -323,7 +382,8 @@
             if (navigator.share) {
                 try {
                     const appContainer = document.getElementById('app-container');
-                    const canvas = await html2canvas(appContainer);
+                    // Increase the scale for a higher resolution screenshot
+                    const canvas = await html2canvas(appContainer, { scale: 2 }); // Adjust scale as needed
                     const shareDataURL = canvas.toDataURL('image/jpeg');
 
                     navigator.share({
@@ -354,8 +414,13 @@
         captureBtn.addEventListener('click', capturePhoto);
         flipBtn.addEventListener('click', toggleCamera);
         shareBtn.addEventListener('click', sharePhotoAndComment);
+        cameraContainer.addEventListener('click', () => {
+            if (showingCapturedImage) {
+                startCamera();
+            }
+        });
+
         startCamera();
     </script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </body>
 </html>
